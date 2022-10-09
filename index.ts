@@ -1,4 +1,3 @@
-import { stringify } from "querystring";
 import { EbayItem, EbayTokenResponse } from "./types";
 
 const axios = require('axios').default;
