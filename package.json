@@ -1,7 +1,7 @@
 {
     "name": "better-bay-common",
-    "version": "1.0.4",
-    "main": "index.ts",
+    "version": "1.0.5",
+    "main": "index.js",
     "type": "module",
     "scripts": {
         "build": "npx tsc"
