@@ -1,4 +1,4 @@
-import { EbayItem, EbayTokenResponse } from "./types";
+import { BetterBayItem, EbayItem, EbayTokenResponse } from "./types";
 
 const axios = require('axios').default;
 
@@ -17,6 +17,7 @@ class BetterBayClient {
             clientSecret: clientSecret,
             redirectUri: redirectUri
         });
+        this._token = ""
         this._instance = axios.create({
             headers: {
                 common: {
@@ -39,9 +40,9 @@ class BetterBayClient {
         return { accessToken: response.access_token, expiresIn: response.expires_in, tokenType: response.token_type }
     }
 
-    async _getItemGroup(itemGroupId): Promise<EbayItem[]> {
+    async _getItemGroup(itemGroupId: String): Promise<BetterBayItem[]> {
         const response = await axios.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
-        return response.items.map(item => {
+        return response.items.map((item: EbayItem) => {
             return {
                 id: item.itemId,
                 title: item.title,
@@ -51,12 +52,12 @@ class BetterBayClient {
         })
     }
 
-    async getCheapestItems(itemIds: string[]): Promise<Record<string, EbayItem>> {
-        const cheapestItems: Record<string, EbayItem> = {};
+    async getCheapestItems(itemIds: string[]): Promise<Record<string, BetterBayItem>> {
+        const cheapestItems: Record<string, BetterBayItem> = {};
         for (const id in itemIds) {
             const itemGroup = await this._getItemGroup(id);
             const cheapestItem = itemGroup.reduce((prev, curr) => { return (prev.price < curr.price) ? prev : curr })
-            cheapestItem[id] = cheapestItem;
+            cheapestItems[id] = cheapestItem;
         }
         return cheapestItems;
     }
