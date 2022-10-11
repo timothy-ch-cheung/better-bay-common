@@ -5,7 +5,7 @@ const axios = require('axios').default;
 const EbayAuthToken = require('ebay-oauth-nodejs-client');
 const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
 
-class BetterBayClient {
+export class BetterBayClient {
 
     _ebayAuthToken;
     _token: String;
@@ -61,8 +61,4 @@ class BetterBayClient {
         }
         return cheapestItems;
     }
-}
-
-module.exports = {
-    BetterBayClient
 }
