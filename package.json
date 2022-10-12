@@ -1,6 +1,6 @@
 {
     "name": "better-bay-common",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "main": "lib/index.js",
     "types": "lib/types.d.ts",
     "typings": "lib/types.d.ts",
