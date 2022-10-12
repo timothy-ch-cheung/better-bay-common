@@ -1,6 +1,6 @@
 {
     "name": "better-bay-common",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "main": "lib/index.js",
     "types": "lib/types.d.ts",
     "typings": "lib/types.d.ts",
@@ -17,7 +17,10 @@
         "typescript": "^4.8.4"
     },
     "exports": {
-        "./lib/*": "./lib/*.js"
+        ".": {
+            "types": "./lib/types.d.ts",
+            "import": "./lib/index.js"
+        }
     },
     "typesVersions": {
         "*": {
