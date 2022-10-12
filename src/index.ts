@@ -4,7 +4,7 @@ import EbayAuthToken from "ebay-oauth-nodejs-client"
 
 const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
 
-export default class BetterBayClient {
+export class BetterBayClient {
 
     _ebayAuthToken;
     _token: string;
