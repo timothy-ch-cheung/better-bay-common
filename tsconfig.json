@@ -4,16 +4,19 @@
     "lib": [
       "es2022"
     ],
-    "module": "commonjs",
+    "module": "NodeNext",
     "target": "es2022",
     "declaration": true,
     "outDir": "./lib/",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "include": [
-    "src/**/*"
+    "/src/**/*.ts",
+    "**/src/**/*.ts",
+    "**/__tests__/**/*.ts",
+    "/types/**/*.d.ts"
   ]
 }

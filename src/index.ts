@@ -1,17 +1,16 @@
-import { BetterBayItem, EbayItem, EbayTokenResponse } from "./types";
+import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse } from "./types.js";
+import axios from "axios";
+import EbayAuthToken from "ebay-oauth-nodejs-client"
 
-const axios = require('axios').default;
-
-const EbayAuthToken = require('ebay-oauth-nodejs-client');
 const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
 
 export class BetterBayClient {
 
     _ebayAuthToken;
-    _token: String;
+    _token: string;
     _instance;
 
-    constructor(clientId: String, clientSecret: String, redirectUri: String) {
+    constructor(clientId: string, clientSecret: string, redirectUri: string) {
         this._ebayAuthToken = new EbayAuthToken({
             clientId: clientId,
             clientSecret: clientSecret,
@@ -21,7 +20,7 @@ export class BetterBayClient {
         this._instance = axios.create({
             headers: {
                 common: {
-                    Authorization: this._token
+                    Authorization: [this._token]
                 }
             }
         })
@@ -41,7 +40,7 @@ export class BetterBayClient {
     }
 
     async _getItemGroup(itemGroupId: String): Promise<BetterBayItem[]> {
-        const response = await axios.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
+        const response: EbayItemResponse = await axios.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
         return response.items.map((item: EbayItem) => {
             return {
                 id: item.itemId,

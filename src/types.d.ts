@@ -15,9 +15,13 @@ export interface EbayItem {
     price: EbayPrice
 }
 
+export interface EbayItemResponse {
+    items: EbayItem[]
+}
+
 export interface BetterBayItem {
     id: string,
     title: string,
     price: number,
-    curreny: string
+    currency: string
 }
