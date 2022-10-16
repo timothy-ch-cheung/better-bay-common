@@ -4,16 +4,10 @@ interface AuthCredentials {
     redirectUri: string
 }
 
-interface ApplicationToken {
-    access_token: string,
-    expires_in: number,
-    token_type: string
-}
-
 declare class EbayAuthToken {
     constructor(credentails: AuthCredentials) { }
 
-    getApplicationToken(environment: string): ApplicationToken {
+    getApplicationToken(environment: string): Promise<string> {
 
     }
 }

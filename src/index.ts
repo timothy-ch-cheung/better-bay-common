@@ -1,5 +1,5 @@
-import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse } from "./types.js";
-import axios from "axios";
+import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken } from "./types.js";
+import axios, { AxiosInstance } from "axios";
 import EbayAuthToken from "ebay-oauth-nodejs-client"
 
 const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
@@ -7,40 +7,19 @@ const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
 export class BetterBayClient {
 
     _ebayAuthToken;
-    _token: string;
     _instance;
 
-    constructor(clientId: string, clientSecret: string, redirectUri: string) {
-        this._ebayAuthToken = new EbayAuthToken({
-            clientId: clientId,
-            clientSecret: clientSecret,
-            redirectUri: redirectUri
-        });
-        this._token = ""
-        this._instance = axios.create({
-            headers: {
-                common: {
-                    Authorization: [this._token]
-                }
-            }
-        })
-
-        let response = this._generateToken();
-        response.then(token => {
-            setInterval(() => this._generateToken(), token.expiresIn);
-        })
+    constructor(ebayAuthToken: EbayAuthToken, instance: AxiosInstance) {
+        this._ebayAuthToken = ebayAuthToken;
+        this._instance = instance;
     }
 
-
-
-    async _generateToken(): Promise<EbayTokenResponse> {
-        const response = await this._ebayAuthToken.getApplicationToken('PRODUCTION');
-        this._token = 'Bearer ' + response.access_token;
-        return { accessToken: response.access_token, expiresIn: response.expires_in, tokenType: response.token_type }
+    setToken(accessToken: string) {
+        this._instance.defaults.headers.Authorization = [buildAuthorization(accessToken)]
     }
 
     async _getItemGroup(itemGroupId: String): Promise<BetterBayItem[]> {
-        const response: EbayItemResponse = await axios.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
+        const response: EbayItemResponse = await this._instance.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
         return response.items.map((item: EbayItem) => {
             return {
                 id: item.itemId,
@@ -60,4 +39,44 @@ export class BetterBayClient {
         }
         return cheapestItems;
     }
+}
+
+function buildAuthorization(token: string) {
+    return 'Bearer ' + token;
+}
+
+async function generateToken(ebayAuthToken: EbayAuthToken): Promise<EbayTokenResponse> {
+    const response: string = await ebayAuthToken.getApplicationToken('PRODUCTION');
+    const applicationToken: ApplicationToken = JSON.parse(response)
+    return { accessToken: applicationToken.access_token, expiresIn: applicationToken.expires_in, tokenType: applicationToken.token_type }
+}
+
+export async function buildBetterBayClient(clientId: string, clientSecret: string, redirectUri: string, autoRefreshToken: boolean): Promise<BetterBayClient> {
+    const ebayAuthToken = new EbayAuthToken({
+        clientId: clientId,
+        clientSecret: clientSecret,
+        redirectUri: redirectUri
+    });
+
+    const token = await generateToken(ebayAuthToken);
+
+    const instance = axios.create({
+        headers: {
+            common: {
+                Authorization: [buildAuthorization(token.accessToken)]
+            }
+        }
+    })
+
+    const client = new BetterBayClient(ebayAuthToken, instance)
+    client.setToken(token.accessToken)
+
+    if (autoRefreshToken) {
+        setInterval(async () => {
+            let token = await generateToken(ebayAuthToken)
+            client.setToken(buildAuthorization(token.accessToken))
+        }, token.expiresIn)
+    }
+
+    return client
 }
