@@ -78,9 +78,9 @@ function buildItemDescription(item: EbayItem, selectionKeys: string[]) {
     item.localizedAspects.map(aspect => {
         aspects[aspect.name] = aspect.value
     })
-    let description = ""
+    let description: Map<string, string> = new Map()
     for (let key of selectionKeys) {
-        description = `${description}[${key}: ${aspects[key]}]`
+        description.set(key, aspects[key])
     }
     return description
 }

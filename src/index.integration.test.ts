@@ -1,4 +1,5 @@
 import { describe, expect, test, beforeAll } from '@jest/globals';
+import exp from 'constants';
 import * as dotenv from 'dotenv'
 import { stringify } from 'querystring';
 import { BetterBayClient, buildBetterBayClient } from './index.js'
@@ -30,7 +31,9 @@ describe('BetterBayClient', () => {
             expect(cheapestItem.id).toEqual("v1|183636048622|691086221725");
             expect(cheapestItem.price).toEqual("1.69")
             expect(cheapestItem.title).toEqual("Carolina Reaper Chilli Pepper Seeds Super Hot!!! Genuine Viable Seeds, UK Stock")
-            expect(cheapestItem.description).toEqual("[Seeds Quantity: 5 Seeds]")
+
+            expect(cheapestItem.description.size).toEqual(1)
+            expect(cheapestItem.description.get("Seeds Quantity")).toEqual("5 Seeds")
         })
     });
 
@@ -45,7 +48,10 @@ describe('BetterBayClient', () => {
             expect(cheapestItem.id).toEqual("v1|354294946878|623687040110");
             expect(cheapestItem.price).toEqual("0.99")
             expect(cheapestItem.title).toEqual("USB Type C Fast Charging Charger Cable for Samsung Galaxy S8 S9 S10 S20+ Note UK")
-            expect(cheapestItem.description).toEqual("[Colour: Sim Tray Pin][Item Length: 1 Piece]")
+
+            expect(cheapestItem.description.size).toEqual(2)
+            expect(cheapestItem.description.get("Colour")).toEqual("Sim Tray Pin")
+            expect(cheapestItem.description.get("Item Length")).toEqual("1 Piece")
         })
     });
 });
