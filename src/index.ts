@@ -1,4 +1,4 @@
-import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken } from "./types.js";
+import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken, AxiosResponse } from "./types.js";
 import axios, { AxiosInstance } from "axios";
 import EbayAuthToken from "ebay-oauth-nodejs-client"
 
@@ -19,20 +19,24 @@ export class BetterBayClient {
     }
 
     async _getItemGroup(itemGroupId: String): Promise<BetterBayItem[]> {
-        const response: EbayItemResponse = await this._instance.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
-        return response.items.map((item: EbayItem) => {
-            return {
-                id: item.itemId,
-                title: item.title,
-                price: item.price.convertedFromValue,
-                currency: item.price.convertedFromCurrency
-            }
-        })
+        try {
+            const response: AxiosResponse<EbayItemResponse> = await this._instance.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
+            return response.data.items.map((item: EbayItem) => {
+                return {
+                    id: item.itemId,
+                    title: item.title,
+                    price: item.price.convertedFromValue,
+                    currency: item.price.convertedFromCurrency
+                }
+            })
+        } catch (error) {
+            throw error;
+        }
     }
 
     async getCheapestItems(itemIds: string[]): Promise<Record<string, BetterBayItem>> {
         const cheapestItems: Record<string, BetterBayItem> = {};
-        for (const id in itemIds) {
+        for (const id of itemIds) {
             const itemGroup = await this._getItemGroup(id);
             const cheapestItem = itemGroup.reduce((prev, curr) => { return (prev.price < curr.price) ? prev : curr })
             cheapestItems[id] = cheapestItem;
@@ -77,6 +81,8 @@ export async function buildBetterBayClient(clientId: string, clientSecret: strin
             client.setToken(buildAuthorization(token.accessToken))
         }, token.expiresIn)
     }
+
+    let test = await client.getCheapestItems(["183636048622"]);
 
     return client
 }

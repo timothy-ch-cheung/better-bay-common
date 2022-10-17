@@ -27,9 +27,9 @@ describe('BetterBayClient', () => {
             const cheapestItem = cheapestItems[ITEM_GROUP_ID]
 
             expect(cheapestItem.currency).toEqual("GBP")
-            expect(cheapestItem.id).toEqual("abc");
-            expect(cheapestItem.price).toEqual(1.69)
-            expect(cheapestItem.title).toEqual("title")
+            expect(cheapestItem.id).toEqual("v1|183636048622|691086221725");
+            expect(cheapestItem.price).toEqual("1.69")
+            expect(cheapestItem.title).toEqual("Carolina Reaper Chilli Pepper Seeds Super Hot!!! Genuine Viable Seeds, UK Stock")
         })
     });
 });

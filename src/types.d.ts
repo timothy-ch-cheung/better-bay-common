@@ -11,7 +11,7 @@ export interface EbayTokenResponse {
 }
 
 interface EbayPrice {
-    convertedFromValue: number,
+    convertedFromValue: string,
     convertedFromCurrency: string
 }
 
@@ -21,6 +21,12 @@ export interface EbayItem {
     price: EbayPrice
 }
 
+export interface AxiosResponse<Type> {
+    data: Type,
+    status: number,
+    statusText: string
+}
+
 export interface EbayItemResponse {
     items: EbayItem[]
 }
@@ -28,6 +34,6 @@ export interface EbayItemResponse {
 export interface BetterBayItem {
     id: string,
     title: string,
-    price: number,
+    price: string,
     currency: string
 }
