@@ -15,10 +15,17 @@ interface EbayPrice {
     convertedFromCurrency: string
 }
 
+interface LocalizedAspect {
+    type: string,
+    name: string,
+    value: string
+}
+
 export interface EbayItem {
     itemId: string,
     title: string,
-    price: EbayPrice
+    price: EbayPrice,
+    localizedAspects: LocalizedAspect[]
 }
 
 export interface AxiosResponse<Type> {
@@ -34,6 +41,7 @@ export interface EbayItemResponse {
 export interface BetterBayItem {
     id: string,
     title: string,
+    description,
     price: string,
     currency: string
 }
