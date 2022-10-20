@@ -54,4 +54,34 @@ describe('BetterBayClient', () => {
             expect(cheapestItem.description.get("Item Length")).toEqual("1 Piece")
         })
     });
+
+    test('Get cheapest item, multiple item groups', () => {
+        const ITEM_GROUP_ID_1 = "294949898083"
+        const ITEM_GROUP_ID_2 = "203640676748"
+        const response: Promise<Record<string, BetterBayItem>> = client.getCheapestItems([ITEM_GROUP_ID_1, ITEM_GROUP_ID_2]);
+
+        return response.then(cheapestItems => {
+            const cheapestItem1 = cheapestItems[ITEM_GROUP_ID_1]
+
+            expect(cheapestItem1.currency).toEqual("GBP")
+            expect(cheapestItem1.id).toEqual("v1|294949898083|593469265674");
+            expect(cheapestItem1.price).toEqual("0.99")
+            expect(cheapestItem1.title).toEqual("For Google Pixel 7 / 7 Pro Case, Slim Silicone Clear Gel Phone Cover")
+
+            expect(cheapestItem1.description.size).toEqual(2)
+            expect(cheapestItem1.description.get("COLOURS")).toEqual("Clear")
+            expect(cheapestItem1.description.get("MODELS")).toEqual("ROYAL MAIL will deliver your ORDER")
+
+            const cheapestItem2 = cheapestItems[ITEM_GROUP_ID_2]
+
+            expect(cheapestItem2.currency).toEqual("GBP")
+            expect(cheapestItem2.id).toEqual("v1|203640676748|504056286559");
+            expect(cheapestItem2.price).toEqual("1.99")
+            expect(cheapestItem2.title).toEqual("Case For Google Pixel 7/6a/6/5a/5/4a/4/3a 5G PU Leather Wallet Flip Phone Cover")
+
+            expect(cheapestItem2.description.size).toEqual(2)
+            expect(cheapestItem2.description.get("Models")).toEqual("Google Pixel 5a 5G (2021)")
+            expect(cheapestItem2.description.get("Colour")).toEqual("Charging Cable")
+        })
+    });
 });
