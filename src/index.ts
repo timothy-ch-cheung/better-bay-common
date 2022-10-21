@@ -122,7 +122,7 @@ export async function buildBetterBayClient(clientId: string, clientSecret: strin
             let token = await generateToken(ebayAuthToken)
             client.setToken(token.accessToken)
             console.log("token will expire in " + token.expiresIn + " seconds")
-        }, token.expiresIn)
+        }, token.expiresIn * 1000)
     }
 
     return client
