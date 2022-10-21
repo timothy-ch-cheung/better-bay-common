@@ -86,9 +86,14 @@ function buildItemDescription(item: EbayItem, selectionKeys: string[]) {
 }
 
 async function generateToken(ebayAuthToken: EbayAuthToken): Promise<EbayTokenResponse> {
-    const response: string = await ebayAuthToken.getApplicationToken('PRODUCTION');
-    const applicationToken: ApplicationToken = JSON.parse(response)
-    return { accessToken: applicationToken.access_token, expiresIn: applicationToken.expires_in, tokenType: applicationToken.token_type }
+    try {
+        const response: string = await ebayAuthToken.getApplicationToken('PRODUCTION');
+        const applicationToken: ApplicationToken = JSON.parse(response)
+        return { accessToken: applicationToken.access_token, expiresIn: applicationToken.expires_in, tokenType: applicationToken.token_type }
+    } catch (error) {
+        throw error
+    }
+
 }
 
 export async function buildBetterBayClient(clientId: string, clientSecret: string, redirectUri: string, autoRefreshToken: boolean): Promise<BetterBayClient> {
