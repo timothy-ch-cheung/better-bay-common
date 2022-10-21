@@ -115,15 +115,15 @@ export async function buildBetterBayClient(clientId: string, clientSecret: strin
 
     const client = new BetterBayClient(ebayAuthToken, instance)
     client.setToken(token.accessToken)
+    console.log("token will expire in " + token.expiresIn + " seconds")
 
     if (autoRefreshToken) {
         setInterval(async () => {
             let token = await generateToken(ebayAuthToken)
-            client.setToken(buildAuthorization(token.accessToken))
+            client.setToken(token.accessToken)
+            console.log("token will expire in " + token.expiresIn + " seconds")
         }, token.expiresIn)
     }
-
-    let test = await client.getCheapestItems(["183636048622"]);
 
     return client
 }
