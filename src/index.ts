@@ -73,14 +73,14 @@ function getSelectionKeys(items: EbayItem[]): string[] {
     return selectionKeys;
 }
 
-function buildItemDescription(item: EbayItem, selectionKeys: string[]) {
+function buildItemDescription(item: EbayItem, selectionKeys: string[]): Record<string, string> {
     const aspects: Record<string, string> = {}
     item.localizedAspects.map(aspect => {
         aspects[aspect.name] = aspect.value
     })
-    let description: Map<string, string> = new Map()
+    let description: Record<string, string> = {}
     for (let key of selectionKeys) {
-        description.set(key, aspects[key])
+        description[key] = aspects[key]
     }
     return description
 }

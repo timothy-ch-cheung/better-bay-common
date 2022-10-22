@@ -32,8 +32,8 @@ describe('BetterBayClient', () => {
             expect(cheapestItem.price).toEqual("1.69")
             expect(cheapestItem.title).toEqual("Carolina Reaper Chilli Pepper Seeds Super Hot!!! Genuine Viable Seeds, UK Stock")
 
-            expect(cheapestItem.description.size).toEqual(1)
-            expect(cheapestItem.description.get("Seeds Quantity")).toEqual("5 Seeds")
+            expect(Object.keys(cheapestItem.description).length).toEqual(1)
+            expect(cheapestItem.description["Seeds Quantity"]).toEqual("5 Seeds")
         })
     });
 
@@ -49,9 +49,9 @@ describe('BetterBayClient', () => {
             expect(cheapestItem.price).toEqual("0.99")
             expect(cheapestItem.title).toEqual("USB Type C Fast Charging Charger Cable for Samsung Galaxy S8 S9 S10 S20+ Note UK")
 
-            expect(cheapestItem.description.size).toEqual(2)
-            expect(cheapestItem.description.get("Colour")).toEqual("Sim Tray Pin")
-            expect(cheapestItem.description.get("Item Length")).toEqual("1 Piece")
+            expect(Object.keys(cheapestItem.description).length).toEqual(2)
+            expect(cheapestItem.description["Colour"]).toEqual("Sim Tray Pin")
+            expect(cheapestItem.description["Item Length"]).toEqual("1 Piece")
         })
     });
 
@@ -68,9 +68,9 @@ describe('BetterBayClient', () => {
             expect(cheapestItem1.price).toEqual("0.99")
             expect(cheapestItem1.title).toEqual("For Google Pixel 7 / 7 Pro Case, Slim Silicone Clear Gel Phone Cover")
 
-            expect(cheapestItem1.description.size).toEqual(2)
-            expect(cheapestItem1.description.get("COLOURS")).toEqual("Clear")
-            expect(cheapestItem1.description.get("MODELS")).toEqual("ROYAL MAIL will deliver your ORDER")
+            expect(Object.keys(cheapestItem1.description).length).toEqual(2)
+            expect(cheapestItem1.description["COLOURS"]).toEqual("Clear")
+            expect(cheapestItem1.description["MODELS"]).toEqual("ROYAL MAIL will deliver your ORDER")
 
             const cheapestItem2 = cheapestItems[ITEM_GROUP_ID_2]
 
@@ -79,9 +79,9 @@ describe('BetterBayClient', () => {
             expect(cheapestItem2.price).toEqual("1.99")
             expect(cheapestItem2.title).toEqual("Case For Google Pixel 7/6a/6/5a/5/4a/4/3a 5G PU Leather Wallet Flip Phone Cover")
 
-            expect(cheapestItem2.description.size).toEqual(2)
-            expect(cheapestItem2.description.get("Models")).toEqual("Google Pixel 5a 5G (2021)")
-            expect(cheapestItem2.description.get("Colour")).toEqual("Charging Cable")
+            expect(Object.keys(cheapestItem2.description).length).toEqual(2)
+            expect(cheapestItem2.description["Models"]).toEqual("Google Pixel 5a 5G (2021)")
+            expect(cheapestItem2.description["Colour"]).toEqual("Charging Cable")
         })
     });
 });

@@ -41,7 +41,7 @@ export interface EbayItemResponse {
 export interface BetterBayItem {
     id: string,
     title: string,
-    description: Map<string, string>,
+    description: Record<string, string>,
     price: string,
     currency: string
 }
