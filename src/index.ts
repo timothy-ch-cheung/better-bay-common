@@ -1,4 +1,4 @@
-import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken, AxiosResponse } from "./types.js";
+import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken, AxiosResponse } from "./@types/types.js";
 import axios, { AxiosInstance } from "axios";
 import EbayAuthToken from "ebay-oauth-nodejs-client"
 import { it } from "node:test";

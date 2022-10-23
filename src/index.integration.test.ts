@@ -3,7 +3,7 @@ import exp from 'constants';
 import * as dotenv from 'dotenv'
 import { stringify } from 'querystring';
 import { BetterBayClient, buildBetterBayClient } from './index.js'
-import { BetterBayItem } from './types.js'
+import { BetterBayItem } from './@types/types.js'
 
 dotenv.config()
 
@@ -66,7 +66,7 @@ describe('BetterBayClient', () => {
             expect(cheapestItem1.currency).toEqual("GBP")
             expect(cheapestItem1.id).toEqual("v1|294949898083|593469265674");
             expect(cheapestItem1.price).toEqual("0.99")
-            expect(cheapestItem1.title).toEqual("For Google Pixel 7 / 7 Pro Case, Slim Silicone Clear Gel Phone Cover")
+            expect(cheapestItem1.title).toEqual("For Google Pixel 7 / 7 Pro 6 5 4 Case, Slim Silicone Clear Gel Phone Cover")
 
             expect(Object.keys(cheapestItem1.description).length).toEqual(2)
             expect(cheapestItem1.description["COLOURS"]).toEqual("Clear")

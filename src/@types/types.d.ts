@@ -15,6 +15,19 @@ interface EbayPrice {
     convertedFromCurrency: string
 }
 
+interface LocalizedAspect {
+    type: string,
+    name: string,
+    value: string
+}
+
+export interface EbayItem {
+    itemId: string,
+    title: string,
+    price: EbayPrice,
+    localizedAspects: LocalizedAspect[]
+}
+
 export interface EbayItem {
     itemId: string,
     title: string,
@@ -28,12 +41,19 @@ export interface EbayItemResponse {
 export interface BetterBayItem {
     id: string,
     title: string,
+    description: Record<string, string>,
     price: number,
     currency: string
 }
 
 declare class EbayAuthToken {
     constructor(clientId: string, clientSecret: string, redirectUri: string) { }
+}
+
+export interface AxiosResponse<Type> {
+    data: Type,
+    status: number,
+    statusText: string
 }
 
 declare module "ebay-oauth-nodejs-client" {
