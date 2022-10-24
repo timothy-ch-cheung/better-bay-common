@@ -1,8 +1,6 @@
 import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken, AxiosResponse } from "./@types/types.js";
 import axios, { AxiosInstance } from "axios";
 import EbayAuthToken from "ebay-oauth-nodejs-client"
-import { it } from "node:test";
-import { stringify } from "node:querystring";
 
 const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
 
