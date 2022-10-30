@@ -19,6 +19,6 @@
     "**/src/**/*.d.ts",
     "**/src/**/*.ts",
     "**/__tests__/**/*.ts",
-    "/types/**/*.d.ts"
+    "./src/@types/**/*.d.ts"
   ]
 }

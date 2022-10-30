@@ -1,4 +1,4 @@
-interface ApplicationToken {
+export interface ApplicationToken {
     access_token: string,
     expires_in: number,
     token_type: string
@@ -46,16 +46,8 @@ export interface BetterBayItem {
     currency: string
 }
 
-declare class EbayAuthToken {
-    constructor(clientId: string, clientSecret: string, redirectUri: string) { }
-}
-
 export interface AxiosResponse<Type> {
     data: Type,
     status: number,
     statusText: string
-}
-
-declare module "ebay-oauth-nodejs-client" {
-    export default EbayAuthToken;
 }
