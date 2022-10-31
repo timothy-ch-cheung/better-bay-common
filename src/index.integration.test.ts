@@ -1,9 +1,7 @@
 import { describe, expect, test, beforeAll } from '@jest/globals';
-import exp from 'constants';
 import * as dotenv from 'dotenv'
-import { stringify } from 'querystring';
 import { BetterBayClient, buildBetterBayClient } from './index.js'
-import { BetterBayItem } from './@types/types.js'
+import { BetterBayItem } from './types.js'
 
 dotenv.config()
 
