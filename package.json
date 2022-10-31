@@ -1,6 +1,6 @@
 {
     "name": "better-bay-common",
-    "version": "1.0.23",
+    "version": "1.0.24",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "type": "module",
@@ -21,7 +21,7 @@
     },
     "exports": {
         ".": {
-            "types": "./lib/types.d.ts",
+            "types": "./lib/index.d.ts",
             "import": "./lib/index.js"
         }
     },
