@@ -62,12 +62,12 @@ describe('BetterBayClient', () => {
             const cheapestItem1 = cheapestItems[ITEM_GROUP_ID_1]
 
             expect(cheapestItem1.currency).toEqual("GBP")
-            expect(cheapestItem1.id).toEqual("v1|294949898083|593469265674");
+            expect(cheapestItem1.id).toEqual("v1|294949898083|593492225536");
             expect(cheapestItem1.price).toEqual("0.99")
-            expect(cheapestItem1.title).toEqual("For Google Pixel 7 / 7 Pro 6 5 4 Case, Slim Silicone Clear Gel Phone Cover")
+            expect(cheapestItem1.title).toEqual("Fits Google Pixel 7 /Pixel 6A / Google Pixel 6 Pro Gel Case Clear Cover TPU Soft")
 
             expect(Object.keys(cheapestItem1.description).length).toEqual(2)
-            expect(cheapestItem1.description["COLOURS"]).toEqual("Clear")
+            expect(cheapestItem1.description["COLOURS"]).toEqual("Black")
             expect(cheapestItem1.description["MODELS"]).toEqual("ROYAL MAIL will deliver your ORDER")
 
             const cheapestItem2 = cheapestItems[ITEM_GROUP_ID_2]

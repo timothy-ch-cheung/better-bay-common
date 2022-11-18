@@ -41,7 +41,8 @@ export class BetterBayClient {
         const cheapestItems: Record<string, BetterBayItem> = {};
         for (const id of itemIds) {
             const itemGroup = await this._getItemGroup(id);
-            const cheapestItem = itemGroup.reduce((prev, curr) => { return (prev.price < curr.price) ? prev : curr })
+            console.log(itemGroup)
+            const cheapestItem = itemGroup.reduce((prev, curr) => { return parseInt(prev.price) < parseInt(curr.price) ? prev : curr })
             cheapestItems[id] = cheapestItem;
         }
         return cheapestItems;

@@ -11,7 +11,7 @@ export interface EbayTokenResponse {
 }
 
 interface EbayPrice {
-    convertedFromValue: number,
+    convertedFromValue: string,
     convertedFromCurrency: string
 }
 
@@ -42,7 +42,7 @@ export interface BetterBayItem {
     id: string,
     title: string,
     description: Record<string, string>,
-    price: number,
+    price: string,
     currency: string
 }
 
