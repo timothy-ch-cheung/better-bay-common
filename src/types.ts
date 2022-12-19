@@ -38,12 +38,40 @@ export interface EbayItemResponse {
     items: EbayItem[]
 }
 
+export interface Rate {
+    limit: string,
+    remaining: string,
+    reset: string,
+    timeWindow: string
+}
+
+export interface Resource {
+    name: string,
+    rates: Rate[]
+}
+
+export interface Limit {
+    apiContext: string,
+    apiName: string,
+    apiVersion: string,
+    resources: Resource[]
+}
+
+export interface EbayLimitResponse {
+    rateLimits: Limit[]
+}
+
 export interface BetterBayItem {
     id: string,
     title: string,
     description: Record<string, string>,
     price: string,
     currency: string
+}
+
+export interface BetterBayLimit {
+    limit: number,
+    remaining: number
 }
 
 export interface AxiosResponse<Type> {

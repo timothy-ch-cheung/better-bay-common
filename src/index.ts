@@ -1,8 +1,20 @@
-import { BetterBayItem, EbayItem, EbayTokenResponse, EbayItemResponse, ApplicationToken, AxiosResponse } from "./types.js";
+import {
+    BetterBayItem,
+    EbayItem,
+    EbayTokenResponse,
+    EbayItemResponse,
+    ApplicationToken,
+    AxiosResponse,
+    EbayLimitResponse,
+    Limit,
+    Resource,
+    BetterBayLimit
+} from "./types.js";
 import axios, { AxiosInstance } from "axios";
 import EbayAuthToken from "ebay-oauth-nodejs-client"
 
-const EBAY_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
+const EBAY_ITEM_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item';
+const EBAY_ANALYTICS_BASE_URL = 'https://api.ebay.com/developer/analytics/v1_beta';
 
 export class BetterBayClient {
 
@@ -20,7 +32,7 @@ export class BetterBayClient {
 
     async _getItemGroup(itemGroupId: String): Promise<BetterBayItem[]> {
         try {
-            const response: AxiosResponse<EbayItemResponse> = await this._instance.get(`${EBAY_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
+            const response: AxiosResponse<EbayItemResponse> = await this._instance.get(`${EBAY_ITEM_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`);
             const selectionKeys = getSelectionKeys(response.data.items)
 
             return response.data.items.map((item: EbayItem) => {
@@ -41,11 +53,29 @@ export class BetterBayClient {
         const cheapestItems: Record<string, BetterBayItem> = {};
         for (const id of itemIds) {
             const itemGroup = await this._getItemGroup(id);
-            console.log(itemGroup)
             const cheapestItem = itemGroup.reduce((prev, curr) => { return parseInt(prev.price) < parseInt(curr.price) ? prev : curr })
             cheapestItems[id] = cheapestItem;
         }
         return cheapestItems;
+    }
+
+    async healthCheck(): Promise<Record<string, BetterBayLimit>> {
+        const response: AxiosResponse<EbayLimitResponse> = await this._instance.get(`${EBAY_ANALYTICS_BASE_URL}/rate_limit`);
+        const limits = response.data.rateLimits.find((limit: Limit) => {
+            return limit.apiName.trim() === "Browse";
+        });
+        const browseLimit = limits?.resources.find((rate: Resource) => {
+            return rate.name.trim() === "buy.browse";
+        });
+        const browseRateLimit = browseLimit?.rates[0];
+
+        return {
+            cheapestItem: {
+                limit: browseRateLimit ? parseInt(browseRateLimit.limit) : -1,
+                remaining: browseRateLimit ? parseInt(browseRateLimit.remaining) : -1
+
+            }
+        };
     }
 }
 
