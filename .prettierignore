@@ -1,0 +1,7 @@
+lib
+.github
+.vscode
+package-lock.json
+package.json
+tsconfig.json
+README.md

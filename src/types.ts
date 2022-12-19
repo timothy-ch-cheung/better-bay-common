@@ -1,81 +1,81 @@
 export interface ApplicationToken {
-    access_token: string,
-    expires_in: number,
-    token_type: string
+  access_token: string;
+  expires_in: number;
+  token_type: string;
 }
 
 export interface EbayTokenResponse {
-    accessToken: string,
-    expiresIn: number,
-    tokenType: string
+  accessToken: string;
+  expiresIn: number;
+  tokenType: string;
 }
 
 interface EbayPrice {
-    convertedFromValue: string,
-    convertedFromCurrency: string
+  convertedFromValue: string;
+  convertedFromCurrency: string;
 }
 
 interface LocalizedAspect {
-    type: string,
-    name: string,
-    value: string
+  type: string;
+  name: string;
+  value: string;
 }
 
 export interface EbayItem {
-    itemId: string,
-    title: string,
-    price: EbayPrice,
-    localizedAspects: LocalizedAspect[]
+  itemId: string;
+  title: string;
+  price: EbayPrice;
+  localizedAspects: LocalizedAspect[];
 }
 
 export interface EbayItem {
-    itemId: string,
-    title: string,
-    price: EbayPrice
+  itemId: string;
+  title: string;
+  price: EbayPrice;
 }
 
 export interface EbayItemResponse {
-    items: EbayItem[]
+  items: EbayItem[];
 }
 
 export interface Rate {
-    limit: string,
-    remaining: string,
-    reset: string,
-    timeWindow: string
+  limit: string;
+  remaining: string;
+  reset: string;
+  timeWindow: string;
 }
 
 export interface Resource {
-    name: string,
-    rates: Rate[]
+  name: string;
+  rates: Rate[];
 }
 
 export interface Limit {
-    apiContext: string,
-    apiName: string,
-    apiVersion: string,
-    resources: Resource[]
+  apiContext: string;
+  apiName: string;
+  apiVersion: string;
+  resources: Resource[];
 }
 
 export interface EbayLimitResponse {
-    rateLimits: Limit[]
+  rateLimits: Limit[];
 }
 
 export interface BetterBayItem {
-    id: string,
-    title: string,
-    description: Record<string, string>,
-    price: string,
-    currency: string
+  id: string;
+  title: string;
+  description: Record<string, string>;
+  price: string;
+  currency: string;
 }
 
 export interface BetterBayLimit {
-    limit: number,
-    remaining: number
+  limit: number;
+  remaining: number;
 }
 
 export interface AxiosResponse<Type> {
-    data: Type,
-    status: number,
-    statusText: string
+  data: Type;
+  status: number;
+  statusText: string;
 }
