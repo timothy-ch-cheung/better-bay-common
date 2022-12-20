@@ -4,11 +4,13 @@ import {
   getSelectionKeys,
   buildItemDescription,
   generateToken,
-  buildBetterBayClient
+  buildBetterBayClient,
+  BetterBayClient
 } from './index.js'
 import { stubInterface } from 'ts-sinon'
 import { EbayItem } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
+import { AxiosInstance } from 'axios'
 
 jest.mock('ebay-oauth-nodejs-client', () => {
   return {
@@ -120,6 +122,30 @@ describe('Helper Functions', () => {
           'Bearer testToken'
         ])
       })
+    })
+  })
+})
+
+describe('Better Bay Client', () => {
+  let client: BetterBayClient
+  const ebayAuthToken = stubInterface<EbayAuthToken>()
+  const instance = stubInterface<AxiosInstance>()
+
+  beforeAll(() => {
+    client = new BetterBayClient(ebayAuthToken, instance)
+  })
+
+  describe('Constructor', () => {
+    test('Without auto refresh', () => {
+      expect(client._interval).toEqual(undefined)
+    })
+
+    test('With auto refresh', async () => {
+      client = new BetterBayClient(ebayAuthToken, instance, {
+        refreshToken: { delay: 123 }
+      })
+      expect(client._interval).toBeDefined()
+      clearInterval(client._interval)
     })
   })
 })

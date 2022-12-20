@@ -17,9 +17,11 @@ const EBAY_ITEM_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item'
 const EBAY_ANALYTICS_BASE_URL =
   'https://api.ebay.com/developer/analytics/v1_beta'
 
-interface Options {
-  refreshToken: boolean
+interface Refresh {
   delay: number
+}
+interface Options {
+  refreshToken?: Refresh
 }
 
 export class BetterBayClient {
@@ -29,10 +31,10 @@ export class BetterBayClient {
   constructor (
     ebayAuthToken: EbayAuthToken,
     instance: AxiosInstance,
-    options: Options
+    options?: Options
   ) {
     this._instance = instance
-    if (options.refreshToken) {
+    if (options?.refreshToken != null) {
       this._interval = setInterval(() => {
         generateToken(ebayAuthToken)
           .then((newToken) => {
@@ -42,7 +44,7 @@ export class BetterBayClient {
           .catch(() => {
             console.log('Failed to refresh token')
           })
-      }, options.delay * 1000)
+      }, options.refreshToken.delay * 1000)
     }
   }
 
@@ -178,7 +180,7 @@ export async function buildBetterBayClient (
     }
   })
 
-  const options = { refreshToken: autoRefreshToken, delay: token.expiresIn }
+  const options = { refreshToken: { delay: token.expiresIn } }
   const client = new BetterBayClient(ebayAuthToken, instance, options)
   client.setToken(token.accessToken)
   console.log('TEST' + JSON.stringify(token))
