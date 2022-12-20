@@ -147,9 +147,7 @@ export function buildItemDescription (
 export async function generateToken (
   ebayAuthToken: EbayAuthToken
 ): Promise<EbayTokenResponse> {
-  const response: string = await ebayAuthToken.getApplicationToken(
-    'PRODUCTION'
-  )
+  const response: string = await ebayAuthToken.getApplicationToken('PRODUCTION')
   const applicationToken: ApplicationToken = JSON.parse(response)
   return {
     accessToken: applicationToken.access_token,
