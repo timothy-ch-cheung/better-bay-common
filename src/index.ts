@@ -89,7 +89,8 @@ export function buildAuthorization (token: string): string {
   return 'Bearer ' + token
 }
 
-function getSelectionKeys (items: EbayItem[]): string[] {
+export function getSelectionKeys (items: EbayItem[]): string[] {
+  console.log(items[0].localizedAspects)
   const categories: Record<string, Set<string>> = {}
   items.forEach((item) => {
     item.localizedAspects.forEach((apsect) => {
@@ -108,7 +109,7 @@ function getSelectionKeys (items: EbayItem[]): string[] {
   return selectionKeys
 }
 
-function buildItemDescription (
+export function buildItemDescription (
   item: EbayItem,
   selectionKeys: string[]
 ): Record<string, string> {
@@ -123,7 +124,7 @@ function buildItemDescription (
   return description
 }
 
-async function generateToken (
+export async function generateToken (
   ebayAuthToken: EbayAuthToken
 ): Promise<EbayTokenResponse> {
   const response: string = await ebayAuthToken.getApplicationToken(
