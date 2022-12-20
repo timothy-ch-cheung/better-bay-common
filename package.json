@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "build": "npx tsc",
+        "test": "jest --detectOpenHandles --testPathPattern=.*unit.test.ts --collect-coverage",
         "integration-test": "jest --detectOpenHandles --testPathPattern=.*integration.test.ts"
     },
     "dependencies": {
