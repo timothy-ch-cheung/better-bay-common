@@ -2,7 +2,7 @@ name: Build and Unit Tests
 run-name: ${{ github.actor }}
 on: [push]
 jobs:
-  Run-Integration-Tests:
+  Run-Unit-Tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,4 +17,5 @@ jobs:
       - run: npm run test
 
       - uses: codecov/codecov-action@v3
-      
+        with:
+          token: ${{ secrets.CODE_COV_TOKEN }}
