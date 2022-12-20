@@ -85,7 +85,7 @@ export class BetterBayClient {
   }
 }
 
-function buildAuthorization (token: string): string {
+export function buildAuthorization (token: string): string {
   return 'Bearer ' + token
 }
 
