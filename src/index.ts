@@ -181,6 +181,7 @@ export async function buildBetterBayClient (
   const options = { refreshToken: autoRefreshToken, delay: token.expiresIn }
   const client = new BetterBayClient(ebayAuthToken, instance, options)
   client.setToken(token.accessToken)
+  console.log('TEST' + JSON.stringify(token))
   console.log(`token will expire in ${token.expiresIn} seconds`)
 
   return client

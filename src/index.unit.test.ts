@@ -3,10 +3,27 @@ import {
   buildAuthorization,
   getSelectionKeys,
   buildItemDescription,
-  generateToken
+  generateToken,
+  buildBetterBayClient
 } from './index.js'
 import { stubInterface } from 'ts-sinon'
 import { EbayItem } from './types.js'
+import EbayAuthToken from 'ebay-oauth-nodejs-client'
+
+jest.mock('ebay-oauth-nodejs-client', () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        getApplicationToken: jest
+          .fn()
+          .mockReturnValue(
+            '{"access_token":"testToken", "expires_in":7200, "token_type": "testType"}'
+          )
+      }
+    })
+  }
+})
 
 const createItem = (colour: string): EbayItem => {
   return {
@@ -85,6 +102,23 @@ describe('Helper Functions', () => {
           expiresIn: 7200,
           tokenType: 'testType'
         })
+      })
+    })
+  })
+
+  describe('Build Better Bay Client', () => {
+    test('When promised resolves, auth token should be defined', async () => {
+      const clientPromise = buildBetterBayClient(
+        'clientId',
+        'clientSecret',
+        'redirectUri',
+        false
+      )
+
+      return await clientPromise.then((client) => {
+        expect(client._instance.defaults.headers.Authorization).toEqual([
+          'Bearer testToken'
+        ])
       })
     })
   })
