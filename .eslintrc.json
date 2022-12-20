@@ -6,7 +6,6 @@
     "extends": [
         "prettier",
         "airbnb-typescript",
-        "plugin:react/recommended",
         "standard-with-typescript"
     ],
     "overrides": [],
@@ -17,6 +16,5 @@
     },
     "plugins": [
         "react"
-    ],
-    "rules": {}
+    ]
 }

@@ -7,9 +7,9 @@ interface AuthCredentials {
 declare class EbayAuthToken {
   constructor(credentails: AuthCredentials) {}
 
-  getApplicationToken(environment: string): Promise<string> {}
+  async getApplicationToken(environment: string): Promise<string> {}
 }
 
-declare module "ebay-oauth-nodejs-client" {
+declare module 'ebay-oauth-nodejs-client' {
   export default EbayAuthToken;
 }
