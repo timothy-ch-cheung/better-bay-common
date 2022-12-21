@@ -17,13 +17,39 @@ const EBAY_ITEM_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item'
 const EBAY_ANALYTICS_BASE_URL =
   'https://api.ebay.com/developer/analytics/v1_beta'
 
-export class BetterBayClient {
-  _ebayAuthToken
-  _instance
+interface Refresh {
+  delay: number
+}
+interface Options {
+  refreshToken?: Refresh
+}
 
-  constructor (ebayAuthToken: EbayAuthToken, instance: AxiosInstance) {
-    this._ebayAuthToken = ebayAuthToken
+export class BetterBayClient {
+  _instance
+  _interval
+  _refreshToken (ebayAuthToken: EbayAuthToken): void {
+    generateToken(ebayAuthToken)
+      .then((newToken) => {
+        this.setToken(newToken.accessToken)
+        console.log(`token will expire in ${newToken.expiresIn} seconds`)
+      })
+      .catch((error: Error) => {
+        console.log(`Failed to refresh token [${error.message}]`)
+      })
+  }
+
+  constructor (
+    ebayAuthToken: EbayAuthToken,
+    instance: AxiosInstance,
+    options?: Options
+  ) {
     this._instance = instance
+    if (options?.refreshToken != null) {
+      this._interval = setInterval(
+        () => this._refreshToken(ebayAuthToken),
+        options.refreshToken.delay * 1000
+      )
+    }
   }
 
   setToken (accessToken: string): void {
@@ -38,6 +64,11 @@ export class BetterBayClient {
     )
     const selectionKeys = getSelectionKeys(response.data.items)
 
+    if (response.data.items.length === 0) {
+      throw new Error(
+        'Call to Ebay API succeeded by zero item groups were returned'
+      )
+    }
     return response.data.items.map((item: EbayItem) => {
       return {
         id: item.itemId,
@@ -56,7 +87,7 @@ export class BetterBayClient {
     for (const id of itemIds) {
       const itemGroup = await this._getItemGroup(id)
       const cheapestItem = itemGroup.reduce((prev, curr) => {
-        return parseInt(prev.price) < parseInt(curr.price) ? prev : curr
+        return parseFloat(prev.price) < parseFloat(curr.price) ? prev : curr
       })
       cheapestItems[id] = cheapestItem
     }
@@ -89,7 +120,7 @@ export function buildAuthorization (token: string): string {
   return 'Bearer ' + token
 }
 
-function getSelectionKeys (items: EbayItem[]): string[] {
+export function getSelectionKeys (items: EbayItem[]): string[] {
   const categories: Record<string, Set<string>> = {}
   items.forEach((item) => {
     item.localizedAspects.forEach((apsect) => {
@@ -108,7 +139,7 @@ function getSelectionKeys (items: EbayItem[]): string[] {
   return selectionKeys
 }
 
-function buildItemDescription (
+export function buildItemDescription (
   item: EbayItem,
   selectionKeys: string[]
 ): Record<string, string> {
@@ -123,12 +154,10 @@ function buildItemDescription (
   return description
 }
 
-async function generateToken (
+export async function generateToken (
   ebayAuthToken: EbayAuthToken
 ): Promise<EbayTokenResponse> {
-  const response: string = await ebayAuthToken.getApplicationToken(
-    'PRODUCTION'
-  )
+  const response: string = await ebayAuthToken.getApplicationToken('PRODUCTION')
   const applicationToken: ApplicationToken = JSON.parse(response)
   return {
     accessToken: applicationToken.access_token,
@@ -159,22 +188,12 @@ export async function buildBetterBayClient (
     }
   })
 
-  const client = new BetterBayClient(ebayAuthToken, instance)
+  const options = autoRefreshToken
+    ? { refreshToken: { delay: token.expiresIn } }
+    : {}
+  const client = new BetterBayClient(ebayAuthToken, instance, options)
   client.setToken(token.accessToken)
   console.log(`token will expire in ${token.expiresIn} seconds`)
-
-  if (autoRefreshToken) {
-    setInterval(() => {
-      generateToken(ebayAuthToken)
-        .then((newToken) => {
-          client.setToken(newToken.accessToken)
-          console.log(`token will expire in ${newToken.expiresIn} seconds`)
-        })
-        .catch(() => {
-          console.log('Failed to refresh token')
-        })
-    }, token.expiresIn * 1000)
-  }
 
   return client
 }

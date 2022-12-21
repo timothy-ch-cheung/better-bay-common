@@ -1,7 +1,7 @@
 interface AuthCredentials {
-  clientId: string;
-  clientSecret: string;
-  redirectUri: string;
+  clientId: string
+  clientSecret: string
+  redirectUri: string
 }
 
 declare class EbayAuthToken {
@@ -11,5 +11,5 @@ declare class EbayAuthToken {
 }
 
 declare module 'ebay-oauth-nodejs-client' {
-  export default EbayAuthToken;
+  export default EbayAuthToken
 }
