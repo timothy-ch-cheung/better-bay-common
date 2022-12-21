@@ -264,6 +264,33 @@ describe('Better Bay Client', () => {
         )
       })
     })
+
+    test('Cheapest Item is found (Decimal)', async () => {
+      instance.get.returns(
+        new Promise((resolve) =>
+          resolve({
+            data: { items: [item('3.18'), item('1.18'), item('1.95')] }
+          })
+        )
+      )
+
+      const getItemPromise = client.getCheapestItems(['123'])
+      return await getItemPromise.then((items) => {
+        expect(items).toEqual({
+          123: {
+            currency: 'GBP',
+            description: {},
+            id: '123',
+            price: '1.18',
+            title: 'Very cool item'
+          }
+        })
+        sinon.assert.calledOnceWithExactly(
+          instance.get,
+          'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
+        )
+      })
+    })
   })
 
   describe('Health Check', () => {
