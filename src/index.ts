@@ -27,6 +27,16 @@ interface Options {
 export class BetterBayClient {
   _instance
   _interval
+  _refreshToken (ebayAuthToken: EbayAuthToken): void {
+    generateToken(ebayAuthToken)
+      .then((newToken) => {
+        this.setToken(newToken.accessToken)
+        console.log(`token will expire in ${newToken.expiresIn} seconds`)
+      })
+      .catch(() => {
+        console.log('Failed to refresh token')
+      })
+  }
 
   constructor (
     ebayAuthToken: EbayAuthToken,
@@ -35,16 +45,10 @@ export class BetterBayClient {
   ) {
     this._instance = instance
     if (options?.refreshToken != null) {
-      this._interval = setInterval(() => {
-        generateToken(ebayAuthToken)
-          .then((newToken) => {
-            this.setToken(newToken.accessToken)
-            console.log(`token will expire in ${newToken.expiresIn} seconds`)
-          })
-          .catch(() => {
-            console.log('Failed to refresh token')
-          })
-      }, options.refreshToken.delay * 1000)
+      this._interval = setInterval(
+        () => this._refreshToken(ebayAuthToken),
+        options.refreshToken.delay * 1000
+      )
     }
   }
 
@@ -112,7 +116,6 @@ export function buildAuthorization (token: string): string {
 }
 
 export function getSelectionKeys (items: EbayItem[]): string[] {
-  console.log(items[0].localizedAspects)
   const categories: Record<string, Set<string>> = {}
   items.forEach((item) => {
     item.localizedAspects.forEach((apsect) => {
@@ -185,7 +188,6 @@ export async function buildBetterBayClient (
     : {}
   const client = new BetterBayClient(ebayAuthToken, instance, options)
   client.setToken(token.accessToken)
-  console.log('TEST' + JSON.stringify(token))
   console.log(`token will expire in ${token.expiresIn} seconds`)
 
   return client

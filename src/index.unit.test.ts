@@ -136,16 +136,35 @@ describe('Better Bay Client', () => {
   })
 
   describe('Constructor', () => {
+    let refreshSpy: any
+
+    beforeAll(() => {
+      jest.useFakeTimers()
+      refreshSpy = jest.spyOn(BetterBayClient.prototype, '_refreshToken')
+    })
+
+    afterAll(() => {
+      jest.useRealTimers()
+      refreshSpy.mockClear()
+    })
     test('Without auto refresh', () => {
       expect(client._interval).toEqual(undefined)
     })
 
     test('With auto refresh', async () => {
       client = new BetterBayClient(ebayAuthToken, instance, {
-        refreshToken: { delay: 123 }
+        refreshToken: { delay: 100 }
       })
       expect(client._interval).toBeDefined()
+      jest.runOnlyPendingTimers()
+      expect(refreshSpy).toBeCalledTimes(1)
       clearInterval(client._interval)
     })
   })
+
+  describe('Internal Methods', () => {})
+
+  describe('Get Cheapest Items', () => {})
+
+  describe('Health Check', () => {})
 })
