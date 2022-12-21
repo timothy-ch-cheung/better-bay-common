@@ -8,7 +8,7 @@ import {
   BetterBayClient
 } from './index.js'
 import { stubInterface, StubbedInstance } from 'ts-sinon'
-import { EbayItem, BetterBayItem } from './types.js'
+import { EbayItem, BetterBayItem, Limit } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { AxiosInstance } from 'axios'
 import sinon from 'sinon'
@@ -129,8 +129,9 @@ describe('Helper Functions', () => {
 
 describe('Better Bay Client', () => {
   let client: BetterBayClient
-  const ebayAuthToken = stubInterface<EbayAuthToken>()
+  let ebayAuthToken: StubbedInstance<EbayAuthToken>
   let instance: StubbedInstance<AxiosInstance>
+  const defaults = stubInterface<AxiosInstance['defaults']>()
   const item = (price: string): EbayItem => {
     return {
       itemId: '123',
@@ -142,11 +143,21 @@ describe('Better Bay Client', () => {
 
   beforeEach(() => {
     instance = stubInterface<AxiosInstance>()
+    instance.defaults = defaults
+    ebayAuthToken = stubInterface<EbayAuthToken>()
     client = new BetterBayClient(ebayAuthToken, instance)
   })
 
   describe('Constructor', () => {
     let refreshSpy: any
+
+    beforeEach(() => {
+      instance.defaults = stubInterface<AxiosInstance['defaults']>()
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
 
     beforeAll(() => {
       jest.useFakeTimers()
@@ -161,7 +172,24 @@ describe('Better Bay Client', () => {
       expect(client._interval).toEqual(undefined)
     })
 
-    test('With auto refresh', async () => {
+    test('With auto refresh, failed to refresh', async () => {
+      client = new BetterBayClient(ebayAuthToken, instance, {
+        refreshToken: { delay: 100 }
+      })
+      expect(client._interval).toBeDefined()
+      jest.runOnlyPendingTimers()
+      expect(refreshSpy).toBeCalledTimes(1)
+      clearInterval(client._interval)
+    })
+
+    test('With auto refresh, successful refresh', async () => {
+      ebayAuthToken.getApplicationToken.returns(
+        new Promise((resolve) =>
+          resolve(
+            '{"access_token":"testToken", "expires_in":7200, "token_type": "testType"}'
+          )
+        )
+      )
       client = new BetterBayClient(ebayAuthToken, instance, {
         refreshToken: { delay: 100 }
       })
@@ -238,5 +266,41 @@ describe('Better Bay Client', () => {
     })
   })
 
-  describe('Health Check', () => {})
+  describe('Health Check', () => {
+    const limit = (callsLeft: string): Limit[] => {
+      return [
+        {
+          apiName: 'Browse',
+          apiContext: 'Buy',
+          apiVersion: 'V1',
+          resources: [
+            {
+              name: 'buy.browse',
+              rates: [
+                {
+                  limit: '100',
+                  remaining: callsLeft,
+                  reset: '2018-08-04T07:09:00.000Z',
+                  timeWindow: '86400'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    test('Should return remaining', async () => {
+      instance.get.returns(
+        new Promise((resolve) =>
+          resolve({
+            data: { rateLimits: limit('55') }
+          })
+        )
+      )
+      const healthcheckPromise = client.healthCheck()
+      return await healthcheckPromise.then((status) => {
+        expect(status).toEqual({ cheapestItem: { limit: 100, remaining: 55 } })
+      })
+    })
+  })
 })

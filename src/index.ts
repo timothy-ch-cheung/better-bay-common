@@ -33,8 +33,8 @@ export class BetterBayClient {
         this.setToken(newToken.accessToken)
         console.log(`token will expire in ${newToken.expiresIn} seconds`)
       })
-      .catch(() => {
-        console.log('Failed to refresh token')
+      .catch((error: Error) => {
+        console.log(`Failed to refresh token [${error.message}]`)
       })
   }
 
