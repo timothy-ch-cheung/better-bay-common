@@ -7,10 +7,11 @@ import {
   buildBetterBayClient,
   BetterBayClient
 } from './index.js'
-import { stubInterface } from 'ts-sinon'
+import { stubInterface, StubbedInstance } from 'ts-sinon'
 import { EbayItem, BetterBayItem } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { AxiosInstance } from 'axios'
+import sinon from 'sinon'
 
 jest.mock('ebay-oauth-nodejs-client', () => {
   return {
@@ -129,15 +130,18 @@ describe('Helper Functions', () => {
 describe('Better Bay Client', () => {
   let client: BetterBayClient
   const ebayAuthToken = stubInterface<EbayAuthToken>()
-  const instance = stubInterface<AxiosInstance>()
-  const getItemResponse: EbayItem = {
-    itemId: '123',
-    title: 'Very cool item',
-    price: { convertedFromCurrency: 'GBP', convertedFromValue: '100' },
-    localizedAspects: [{ type: 'STRING', name: 'Colour', value: 'Black' }]
+  let instance: StubbedInstance<AxiosInstance>
+  const item = (price: string): EbayItem => {
+    return {
+      itemId: '123',
+      title: 'Very cool item',
+      price: { convertedFromCurrency: 'GBP', convertedFromValue: price },
+      localizedAspects: [{ type: 'STRING', name: 'Colour', value: 'Black' }]
+    }
   }
 
-  beforeAll(() => {
+  beforeEach(() => {
+    instance = stubInterface<AxiosInstance>()
     client = new BetterBayClient(ebayAuthToken, instance)
   })
 
@@ -171,9 +175,7 @@ describe('Better Bay Client', () => {
   describe('Internal Methods', () => {
     test('Get Item Group', async () => {
       instance.get.returns(
-        new Promise((resolve) =>
-          resolve({ data: { items: [getItemResponse] } })
-        )
+        new Promise((resolve) => resolve({ data: { items: [item('100')] } }))
       )
 
       const getItemPromise = client._getItemGroup('123')
@@ -184,11 +186,57 @@ describe('Better Bay Client', () => {
         expect(items[0].price).toEqual('100')
         expect(items[0].currency).toEqual('GBP')
         expect(items[0].description).toEqual({})
+        sinon.assert.calledOnceWithExactly(
+          instance.get,
+          'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
+        )
       })
     })
   })
 
-  describe('Get Cheapest Items', () => {})
+  describe('Get Cheapest Items', () => {
+    test('No items returned', async () => {
+      instance.get.returns(
+        new Promise((resolve) => resolve({ data: { items: [] } }))
+      )
+
+      const getItemPromise = client.getCheapestItems(['123'])
+      return await getItemPromise.catch((error) => {
+        expect(error.message).toEqual(
+          'Call to Ebay API succeeded by zero item groups were returned'
+        )
+        sinon.assert.calledOnceWithExactly(
+          instance.get,
+          'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
+        )
+      })
+    })
+
+    test('Cheapest Item is found', async () => {
+      instance.get.returns(
+        new Promise((resolve) =>
+          resolve({ data: { items: [item('100'), item('2')] } })
+        )
+      )
+
+      const getItemPromise = client.getCheapestItems(['123'])
+      return await getItemPromise.then((items) => {
+        expect(items).toEqual({
+          123: {
+            currency: 'GBP',
+            description: {},
+            id: '123',
+            price: '2',
+            title: 'Very cool item'
+          }
+        })
+        sinon.assert.calledOnceWithExactly(
+          instance.get,
+          'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
+        )
+      })
+    })
+  })
 
   describe('Health Check', () => {})
 })

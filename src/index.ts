@@ -64,6 +64,11 @@ export class BetterBayClient {
     )
     const selectionKeys = getSelectionKeys(response.data.items)
 
+    if (response.data.items.length === 0) {
+      throw new Error(
+        'Call to Ebay API succeeded by zero item groups were returned'
+      )
+    }
     return response.data.items.map((item: EbayItem) => {
       return {
         id: item.itemId,
