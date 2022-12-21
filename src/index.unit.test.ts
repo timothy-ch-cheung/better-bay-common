@@ -8,7 +8,7 @@ import {
   BetterBayClient
 } from './index.js'
 import { stubInterface } from 'ts-sinon'
-import { EbayItem } from './types.js'
+import { EbayItem, BetterBayItem } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { AxiosInstance } from 'axios'
 
@@ -130,6 +130,12 @@ describe('Better Bay Client', () => {
   let client: BetterBayClient
   const ebayAuthToken = stubInterface<EbayAuthToken>()
   const instance = stubInterface<AxiosInstance>()
+  const getItemResponse: EbayItem = {
+    itemId: '123',
+    title: 'Very cool item',
+    price: { convertedFromCurrency: 'GBP', convertedFromValue: '100' },
+    localizedAspects: [{ type: 'STRING', name: 'Colour', value: 'Black' }]
+  }
 
   beforeAll(() => {
     client = new BetterBayClient(ebayAuthToken, instance)
@@ -162,7 +168,25 @@ describe('Better Bay Client', () => {
     })
   })
 
-  describe('Internal Methods', () => {})
+  describe('Internal Methods', () => {
+    test('Get Item Group', async () => {
+      instance.get.returns(
+        new Promise((resolve) =>
+          resolve({ data: { items: [getItemResponse] } })
+        )
+      )
+
+      const getItemPromise = client._getItemGroup('123')
+      return await getItemPromise.then((items: BetterBayItem[]) => {
+        expect(items.length).toEqual(1)
+        expect(items[0].id).toEqual('123')
+        expect(items[0].title).toEqual('Very cool item')
+        expect(items[0].price).toEqual('100')
+        expect(items[0].currency).toEqual('GBP')
+        expect(items[0].description).toEqual({})
+      })
+    })
+  })
 
   describe('Get Cheapest Items', () => {})
 
