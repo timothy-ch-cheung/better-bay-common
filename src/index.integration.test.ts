@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeAll } from '@jest/globals'
 import * as dotenv from 'dotenv'
 import { BetterBayClient, buildBetterBayClient } from './index.js'
-import { BetterBayItem, BetterBayLimit } from './types.js'
+import { BetterBayItemResponse, BetterBayLimit } from './types.js'
 
 dotenv.config()
 
@@ -25,7 +25,7 @@ describe('BetterBayClient', () => {
   describe('Buy API', () => {
     test('Get cheapest item, single item group', async () => {
       const ITEM_GROUP_ID = '183636048622'
-      const response: Promise<Record<string, BetterBayItem>> =
+      const response: Promise<Record<string, BetterBayItemResponse>> =
         client.getCheapestItems([ITEM_GROUP_ID])
 
       return await response.then((cheapestItems) => {
@@ -45,7 +45,7 @@ describe('BetterBayClient', () => {
 
     test('Get cheapest item, single item group, multiple options', async () => {
       const ITEM_GROUP_ID = '354294946878'
-      const response: Promise<Record<string, BetterBayItem>> =
+      const response: Promise<Record<string, BetterBayItemResponse>> =
         client.getCheapestItems([ITEM_GROUP_ID])
 
       return await response.then((cheapestItems) => {
@@ -67,7 +67,7 @@ describe('BetterBayClient', () => {
     test('Get cheapest item, multiple item groups', async () => {
       const ITEM_GROUP_ID_1 = '294949898083'
       const ITEM_GROUP_ID_2 = '203640676748'
-      const response: Promise<Record<string, BetterBayItem>> =
+      const response: Promise<Record<string, BetterBayItemResponse>> =
         client.getCheapestItems([ITEM_GROUP_ID_1, ITEM_GROUP_ID_2])
 
       return await response.then((cheapestItems) => {

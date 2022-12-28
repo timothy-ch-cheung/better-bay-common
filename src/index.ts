@@ -1,5 +1,7 @@
 import {
   BetterBayItem,
+  BetterBayItemResponse,
+  BetterBayItemGroup,
   EbayItem,
   EbayTokenResponse,
   EbayItemResponse,
@@ -58,7 +60,7 @@ export class BetterBayClient {
     ]
   }
 
-  async _getItemGroup (itemGroupId: string): Promise<BetterBayItem[]> {
+  async _getItemGroup (itemGroupId: string): Promise<BetterBayItemGroup> {
     const response: AxiosResponse<EbayItemResponse> = await this._instance.get(
       `${EBAY_ITEM_BASE_URL}/get_items_by_item_group?item_group_id=${itemGroupId}`
     )
@@ -69,27 +71,37 @@ export class BetterBayClient {
         'Call to Ebay API succeeded by zero item groups were returned'
       )
     }
-    return response.data.items.map((item: EbayItem) => {
-      return {
-        id: item.itemId,
-        title: item.title,
-        price: item.price.convertedFromValue,
-        currency: item.price.convertedFromCurrency,
-        description: buildItemDescription(item, selectionKeys)
+    const ebayItems: BetterBayItem[] = response.data.items.map(
+      (item: EbayItem) => {
+        return {
+          id: item.itemId,
+          price: item.price.convertedFromValue,
+          description: buildItemDescription(item, selectionKeys)
+        }
       }
-    })
+    )
+    const first = response.data.items[0]
+    return {
+      title: first.title,
+      currency: first.price.convertedFromCurrency,
+      items: ebayItems
+    }
   }
 
   async getCheapestItems (
     itemIds: string[]
-  ): Promise<Record<string, BetterBayItem>> {
-    const cheapestItems: Record<string, BetterBayItem> = {}
+  ): Promise<Record<string, BetterBayItemResponse>> {
+    const cheapestItems: Record<string, BetterBayItemResponse> = {}
     for (const id of itemIds) {
       const itemGroup = await this._getItemGroup(id)
-      const cheapestItem = itemGroup.reduce((prev, curr) => {
+      const cheapestItem = itemGroup.items.reduce((prev, curr) => {
         return parseFloat(prev.price) < parseFloat(curr.price) ? prev : curr
       })
-      cheapestItems[id] = cheapestItem
+      cheapestItems[id] = {
+        ...cheapestItem,
+        title: itemGroup.title,
+        currency: itemGroup.currency
+      }
     }
     return cheapestItems
   }
@@ -198,4 +210,4 @@ export async function buildBetterBayClient (
   return client
 }
 
-export { BetterBayItem }
+export { BetterBayItemResponse }
