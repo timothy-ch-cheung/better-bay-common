@@ -57,10 +57,19 @@ export interface EbayLimitResponse {
 
 export interface BetterBayItem {
   id: string
-  title: string
   description: Record<string, string>
   price: string
+}
+
+export interface BetterBayItemResponse extends BetterBayItem {
+  title: string
   currency: string
+}
+
+export interface BetterBayItemGroup {
+  title: string
+  currency: string
+  items: BetterBayItem[]
 }
 
 export interface BetterBayLimit {
