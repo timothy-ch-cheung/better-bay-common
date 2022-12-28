@@ -8,7 +8,7 @@ import {
   BetterBayClient
 } from './index.js'
 import { stubInterface, StubbedInstance } from 'ts-sinon'
-import { EbayItem, BetterBayItem, Limit } from './types.js'
+import { EbayItem, Limit, BetterBayItemGroup } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { AxiosInstance } from 'axios'
 import sinon from 'sinon'
@@ -207,13 +207,14 @@ describe('Better Bay Client', () => {
       )
 
       const getItemPromise = client._getItemGroup('123')
-      return await getItemPromise.then((items: BetterBayItem[]) => {
-        expect(items.length).toEqual(1)
-        expect(items[0].id).toEqual('123')
-        expect(items[0].title).toEqual('Very cool item')
-        expect(items[0].price).toEqual('100')
-        expect(items[0].currency).toEqual('GBP')
-        expect(items[0].description).toEqual({})
+      return await getItemPromise.then((itemGroup: BetterBayItemGroup) => {
+        expect(itemGroup.title).toEqual('Very cool item')
+        expect(itemGroup.currency).toEqual('GBP')
+
+        expect(itemGroup.items.length).toEqual(1)
+        expect(itemGroup.items[0].id).toEqual('123')
+        expect(itemGroup.items[0].price).toEqual('100')
+        expect(itemGroup.items[0].description).toEqual({})
         sinon.assert.calledOnceWithExactly(
           instance.get,
           'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
