@@ -11,5 +11,5 @@ export interface Report {
 }
 
 export interface Processor {
-  score: (items: BetterBayItem[], title: string) => Report
+  score: (items: BetterBayItem[], title: string) => Promise<Report>
 }
