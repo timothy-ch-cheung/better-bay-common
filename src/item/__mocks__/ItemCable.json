@@ -1,29 +1,27 @@
-[
-  {
-    "id": "123",
-    "title": "Fast USB C Cable For Samsung Galaxy S20FE A42 Note 20 5G",
-    "price": "0.99",
-    "currency": "GBP",
-    "description": {
-      "Colour": "Sim Tray Ejector"
+{
+  "title": "Fast USB C Cable For Samsung Galaxy S20FE A42 Note 20 5G",
+  "currency": "GBP",
+  "items": [
+    {
+      "id": "123",
+      "price": "0.99",
+      "description": {
+        "Colour": "Sim Tray Ejector"
+      }
+    },
+    {
+      "id": "234",
+      "price": "2.75",
+      "description": {
+        "Colour": "Black"
+      }
+    },
+    {
+      "id": "345",
+      "price": "2.75",
+      "description": {
+        "Colour": "White"
+      }
     }
-  },
-  {
-    "id": "234",
-    "title": "Fast USB C Cable For Samsung Galaxy S20FE A42 Note 20 5G",
-    "price": "2.75",
-    "currency": "GBP",
-    "description": {
-      "Colour": "Black"
-    }
-  },
-  {
-    "id": "345",
-    "title": "Fast USB C Cable For Samsung Galaxy S20FE A42 Note 20 5G",
-    "price": "2.75",
-    "currency": "GBP",
-    "description": {
-      "Colour": "White"
-    }
-  }
-]
+  ]
+}

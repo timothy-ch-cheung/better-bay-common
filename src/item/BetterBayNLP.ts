@@ -1,9 +1,5 @@
 import { BetterBayItem } from '../types.js'
 
-interface BetterBayScore {
-  score: number
-}
-
 export class BetterBayNLP {
   classify (items: BetterBayItem[], title: string): boolean {
     return false
