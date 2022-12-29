@@ -2,7 +2,7 @@ import { BetterBayItem } from '../types.js'
 
 export interface BetterBayScore {
   score: number
-  confiedence: number
+  confidence: number
 }
 
 export interface Report {
