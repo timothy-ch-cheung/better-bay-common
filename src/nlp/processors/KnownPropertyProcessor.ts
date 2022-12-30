@@ -3,7 +3,7 @@ import { BetterBayItem } from '../../types.js'
 import natural, { BrillPOSTagger, Sentence, WordTokenizer } from 'natural'
 import { CachedDictionaryClient } from './../Dictionary.js'
 
-enum Type {
+export enum Type {
   COLOUR = 'colour'
 }
 
