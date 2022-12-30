@@ -109,3 +109,4 @@ typings/
 # Build Files
 lib/
 dist/
+.idea/

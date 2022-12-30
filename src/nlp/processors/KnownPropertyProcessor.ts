@@ -1,5 +1,5 @@
-import { Processor, Report, BetterBayScore } from './Processor.js'
-import { BetterBayItem } from '../types.js'
+import { Processor, Report, BetterBayScore } from '../Processor.js'
+import { BetterBayItem } from '../../types.js'
 import axios from 'axios'
 import natural, { BrillPOSTagger, Sentence, WordTokenizer } from 'natural'
 import {
@@ -8,7 +8,7 @@ import {
   NOUN,
   NoDefinitionResponse,
   Word
-} from './Dictionary.js'
+} from './../Dictionary.js'
 
 enum Type {
   COLOUR = 'colour'
