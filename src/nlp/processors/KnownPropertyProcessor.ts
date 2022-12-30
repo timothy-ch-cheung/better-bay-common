@@ -1,14 +1,7 @@
 import { Processor, Report, BetterBayScore } from '../Processor.js'
 import { BetterBayItem } from '../../types.js'
-import axios from 'axios'
 import natural, { BrillPOSTagger, Sentence, WordTokenizer } from 'natural'
-import {
-  DICTIONARY_URL,
-  NO_DEFS_FOUND,
-  NOUN,
-  NoDefinitionResponse,
-  Word
-} from './../Dictionary.js'
+import { CachedDictionaryClient } from './../Dictionary.js'
 
 enum Type {
   COLOUR = 'colour'
@@ -19,87 +12,62 @@ const NOUNS = ['N', 'NN', 'NNP', 'NNPS', 'NNS']
 const PROPERTIES: Map<string, string[]> = new Map()
 PROPERTIES.set(Type.COLOUR, ['color', 'colour'])
 
-export class CachedDictionaryClient {
-  __cache: Map<string, Map<string, boolean>>
+class KnownPropertyStore {
+  __cache: Map<Type, CachedDictionaryClient<boolean>>
+  __defaultVal = false
 
   constructor () {
     this.__cache = new Map()
     for (const key of Object.values(Type)) {
-      this.__cache.set(key, new Map())
-    }
-  }
-
-  async _callDictionary (
-    word: string
-  ): Promise<NoDefinitionResponse | Record<string, Word>> {
-    return await axios.get(DICTIONARY_URL + word)
-  }
-
-  _getNounDefinitions (definition: Record<string, Word>): string[] {
-    return Object.values(definition)
-      .map((word) => {
-        return Object.values(word.meanings).map((meaning) => {
-          if (meaning.partOfSpeech === NOUN) {
-            return Object.values(meaning.definitions).map((defn) => {
-              return defn.definition
-            })
-          } else {
-            return []
-          }
-        })
-      })
-      .flat(3)
-  }
-
-  async hasPropertyInDefinition (type: Type, word: string): Promise<boolean> {
-    const cachedDefinition = this.__cache.get(type)?.get(word)
-    if (cachedDefinition !== undefined) {
-      return cachedDefinition
-    }
-    if (PROPERTIES.get(type) === undefined) {
-      return false
-    }
-    const props = PROPERTIES.get(type) as string[]
-
-    await this._callDictionary(word).then(
-      (response: NoDefinitionResponse | Record<string, Word>) => {
-        if (response.title === NO_DEFS_FOUND) {
-          this.__cache.get(type)?.set(word, false)
-          return false
-        }
-
-        const definitions = this._getNounDefinitions(
-          response as Record<string, Word>
-        )
+      const mappingFunc = (definitions: string[]): boolean => {
         for (const defn of definitions) {
-          for (const prop of props) {
+          for (const prop of PROPERTIES.get(key) as string[]) {
             if (defn.toLowerCase().includes(prop)) {
-              this.__cache.get(type)?.set(word, true)
               return true
             }
           }
         }
+        return this.__defaultVal
       }
-    )
-    this.__cache.get(type)?.set(word, false)
-    return false
+
+      this.__cache.set(
+        key,
+        new CachedDictionaryClient<boolean>(mappingFunc, false)
+      )
+    }
+  }
+
+  async hasProperty (word: string, type: Type): Promise<boolean> {
+    return (await this.__cache.get(type)?.getDef(word)) ?? this.__defaultVal
   }
 }
+
 export class KnownPropertyProcessor implements Processor {
   _tagger: BrillPOSTagger
   _tokenizer: WordTokenizer
-  _dictionary: CachedDictionaryClient
+  _propertes: KnownPropertyStore
 
   constructor () {
     const lexicon = new natural.Lexicon('EN', 'N')
     const ruleSet = new natural.RuleSet('EN')
     this._tagger = new natural.BrillPOSTagger(lexicon, ruleSet)
     this._tokenizer = new natural.WordTokenizer()
-    this._dictionary = new CachedDictionaryClient()
+    this._propertes = new KnownPropertyStore()
   }
 
   _getDescriptionString (item: BetterBayItem): string {
     return Object.values(item.description).join(' ')
+  }
+
+  _descriptionContainsProp (item: BetterBayItem, type: Type): boolean {
+    for (const descProp of Object.keys(item.description)) {
+      for (const prop of PROPERTIES.get(type) as string[]) {
+        if (descProp.toLowerCase().includes(prop)) {
+          return true
+        }
+      }
+    }
+    return false
   }
 
   _tagPos (description: string): Sentence {
@@ -108,9 +76,12 @@ export class KnownPropertyProcessor implements Processor {
   }
 
   async score (items: BetterBayItem[], title: string): Promise<Report> {
-    const reportPromises = Object.values(Type).map(
-      async (type) => await this._score(items, title, type)
-    )
+    const reportPromises = Object.values(Type).map(async (type) => {
+      if (this._descriptionContainsProp(items[0], type)) {
+        return await this._score(items, title, type)
+      }
+      return { confidence: 0, scores: {} }
+    })
     const reports = await Promise.all(reportPromises)
     return reports.reduce((best, curr) => {
       return best.confidence > curr.confidence ? best : curr
@@ -130,13 +101,10 @@ export class KnownPropertyProcessor implements Processor {
         if (!NOUNS.includes(word.tag)) {
           return
         }
-        const dictionaryPromise = this._dictionary.hasPropertyInDefinition(
-          type,
-          word.token
-        )
-        dictionaryPromise
-          .then((hasPropInDef) => {
-            if (hasPropInDef) {
+        const propertyPromise = this._propertes.hasProperty(word.token, type)
+        propertyPromise
+          .then((hasProp) => {
+            if (hasProp) {
               results[item.id] = { score: 1, confidence: 1 }
             }
           })
