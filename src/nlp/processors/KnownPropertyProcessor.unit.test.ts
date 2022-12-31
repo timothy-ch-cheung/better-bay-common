@@ -3,7 +3,7 @@ import {
   KnownPropertyProcessor,
   Type
 } from './KnownPropertyProcessor.js'
-import { BetterBayItem } from '../../types.js'
+import { item1, item2 } from '../__mocks__/betterBayMocks.js'
 import { describe, expect, test } from '@jest/globals'
 
 const getDefMock = jest.fn()
@@ -14,27 +14,6 @@ jest.mock('./../Dictionary.js', () => {
     })
   }
 })
-
-const item1: (itemId: string) => BetterBayItem = (itemId: string) => {
-  return {
-    id: itemId,
-    price: '0.99',
-    description: {
-      color: 'black'
-    }
-  }
-}
-
-const item2: (itemId: string) => BetterBayItem = (itemId: string) => {
-  return {
-    id: itemId,
-    price: '1.99',
-    description: {
-      quantity: '4',
-      size: 'large'
-    }
-  }
-}
 
 describe('KnownPropertyStore', () => {
   let knownPropertyStore: KnownPropertyStore
