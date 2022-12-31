@@ -8,32 +8,35 @@ export enum Type {
 }
 
 const NOUNS = ['N', 'NN', 'NNP', 'NNPS', 'NNS']
+const ADJECTIVE = 'JJ'
 
 const PROPERTIES: Map<string, string[]> = new Map()
 PROPERTIES.set(Type.COLOUR, ['color', 'colour'])
 
-class KnownPropertyStore {
+export class KnownPropertyStore {
   __cache: Map<Type, CachedDictionaryClient<boolean>>
   __defaultVal = false
 
   constructor () {
     this.__cache = new Map()
     for (const key of Object.values(Type)) {
-      const mappingFunc = (definitions: string[]): boolean => {
-        for (const defn of definitions) {
-          for (const prop of PROPERTIES.get(key) as string[]) {
-            if (defn.toLowerCase().includes(prop)) {
-              return true
-            }
-          }
-        }
-        return this.__defaultVal
-      }
-
       this.__cache.set(
         key,
-        new CachedDictionaryClient<boolean>(mappingFunc, false)
+        new CachedDictionaryClient<boolean>(this._createMappingFunc(key), false)
       )
+    }
+  }
+
+  _createMappingFunc (key: string): (defn: string[]) => boolean {
+    return (definitions: string[]): boolean => {
+      for (const defn of definitions) {
+        for (const prop of PROPERTIES.get(key) as string[]) {
+          if (defn.toLowerCase().includes(prop)) {
+            return true
+          }
+        }
+      }
+      return this.__defaultVal
     }
   }
 
@@ -45,14 +48,14 @@ class KnownPropertyStore {
 export class KnownPropertyProcessor implements Processor {
   _tagger: BrillPOSTagger
   _tokenizer: WordTokenizer
-  _propertes: KnownPropertyStore
+  _properties: KnownPropertyStore
 
   constructor () {
     const lexicon = new natural.Lexicon('EN', 'N')
     const ruleSet = new natural.RuleSet('EN')
     this._tagger = new natural.BrillPOSTagger(lexicon, ruleSet)
     this._tokenizer = new natural.WordTokenizer()
-    this._propertes = new KnownPropertyStore()
+    this._properties = new KnownPropertyStore()
   }
 
   _getDescriptionString (item: BetterBayItem): string {
@@ -78,7 +81,7 @@ export class KnownPropertyProcessor implements Processor {
   async score (items: BetterBayItem[], title: string): Promise<Report> {
     const reportPromises = Object.values(Type).map(async (type) => {
       if (this._descriptionContainsProp(items[0], type)) {
-        return await this._score(items, title, type)
+        return await this._score(items, type)
       }
       return { confidence: 0, scores: {} }
     })
@@ -88,28 +91,20 @@ export class KnownPropertyProcessor implements Processor {
     })
   }
 
-  async _score (
-    items: BetterBayItem[],
-    title: string,
-    type: Type
-  ): Promise<Report> {
+  async _score (items: BetterBayItem[], type: Type): Promise<Report> {
     const results: Record<string, BetterBayScore> = {}
     for (const item of items) {
       const description = this._getDescriptionString(item)
       const sentence = this._tagPos(description)
-      sentence.taggedWords.forEach((word) => {
-        if (!NOUNS.includes(word.tag)) {
-          return
+      for (const word of sentence.taggedWords) {
+        if (!NOUNS.includes(word.tag) && word.tag !== ADJECTIVE) {
+          continue
         }
-        const propertyPromise = this._propertes.hasProperty(word.token, type)
-        propertyPromise
-          .then((hasProp) => {
-            if (hasProp) {
-              results[item.id] = { score: 1, confidence: 1 }
-            }
-          })
-          .catch((error: Error) => console.log(error.message))
-      })
+        const hasProp = await this._properties.hasProperty(word.token, type)
+        if (hasProp) {
+          results[item.id] = { score: 1, confidence: 1 }
+        }
+      }
       results[item.id] ??= { score: 0, confidence: 0 }
     }
     const sumConfidence = Object.values(results).reduce((acc, val) => {
