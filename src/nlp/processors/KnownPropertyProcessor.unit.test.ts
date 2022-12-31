@@ -141,15 +141,48 @@ describe('KnownPropertyProcessor scoring', () => {
         Type.COLOUR
       )
       expect(report).toEqual({
-        confidence: 0.5,
+        confidence: 0.75,
         scores: {
           123: {
             confidence: 1,
             score: 1
           },
           234: {
-            confidence: 0,
+            confidence: 0.5,
             score: 0
+          }
+        }
+      })
+    })
+
+    test('Three return true and one returns false, has higher confidence score', async () => {
+      getDefMock
+        .mockResolvedValueOnce(true)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(true)
+      const report = await knownPropertyProcessor._score(
+        [item1('123'), item1('234'), item1('345'), item1('456')],
+        Type.COLOUR
+      )
+      expect(report).toEqual({
+        confidence: 0.9375,
+        scores: {
+          123: {
+            confidence: 1,
+            score: 1
+          },
+          234: {
+            confidence: 0.75,
+            score: 0
+          },
+          345: {
+            confidence: 1,
+            score: 1
+          },
+          456: {
+            confidence: 1,
+            score: 1
           }
         }
       })

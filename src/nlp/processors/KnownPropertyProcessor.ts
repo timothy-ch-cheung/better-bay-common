@@ -107,10 +107,22 @@ export class KnownPropertyProcessor implements Processor {
       }
       results[item.id] ??= { score: 0, confidence: 0 }
     }
+    const numResults = Object.keys(results).length
+
+    const avgScore =
+      Object.values(results).reduce((acc, val) => {
+        return acc + val.score
+      }, 0) / numResults
+    Object.keys(results).forEach((key) => {
+      if (results[key].score === 0) {
+        results[key].confidence = avgScore
+      }
+    })
+
     const sumConfidence = Object.values(results).reduce((acc, val) => {
-      return acc + val.score
+      return acc + val.confidence
     }, 0)
-    const avgConfidence = sumConfidence / Object.keys(results).length
+    const avgConfidence = sumConfidence / numResults
     return { confidence: avgConfidence, scores: results }
   }
 }
