@@ -3,7 +3,7 @@ import { BetterBayScore, Processor } from './Processor.js'
 import { KnownPropertyProcessor } from './processors/KnownPropertyProcessor.js'
 
 const processors: Processor[] = [new KnownPropertyProcessor()]
-const CONFIDENCE_THRESHOLD = 0.75
+const CONFIDENCE_THRESHOLD = 0.65
 const SCORE_THRESHHOLD = 0.5
 
 export class BetterBayNLP {

@@ -14,6 +14,7 @@ import {
 } from './types.js'
 import axios, { AxiosInstance } from 'axios'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
+import { BetterBayNLP } from './nlp/BetterBayNLP.js'
 
 const EBAY_ITEM_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item'
 const EBAY_ANALYTICS_BASE_URL =
@@ -29,6 +30,7 @@ interface Options {
 export class BetterBayClient {
   _instance
   _interval
+  _betterBayNLP
   _refreshToken (ebayAuthToken: EbayAuthToken): void {
     generateToken(ebayAuthToken)
       .then((newToken) => {
@@ -46,6 +48,7 @@ export class BetterBayClient {
     options?: Options
   ) {
     this._instance = instance
+    this._betterBayNLP = new BetterBayNLP()
     if (options?.refreshToken != null) {
       this._interval = setInterval(
         () => this._refreshToken(ebayAuthToken),
@@ -68,7 +71,7 @@ export class BetterBayClient {
 
     if (response.data.items.length === 0) {
       throw new Error(
-        'Call to Ebay API succeeded by zero item groups were returned'
+        'Call to Ebay API succeeded, but zero item groups were returned'
       )
     }
     const ebayItems: BetterBayItem[] = response.data.items.map(
@@ -89,7 +92,8 @@ export class BetterBayClient {
   }
 
   async getCheapestItems (
-    itemIds: string[]
+    itemIds: string[],
+    analyse: boolean = false
   ): Promise<Record<string, BetterBayItemResponse>> {
     const cheapestItems: Record<string, BetterBayItemResponse> = {}
     for (const id of itemIds) {
@@ -97,10 +101,19 @@ export class BetterBayClient {
       const cheapestItem = itemGroup.items.reduce((prev, curr) => {
         return parseFloat(prev.price) < parseFloat(curr.price) ? prev : curr
       })
+
       cheapestItems[id] = {
         ...cheapestItem,
         title: itemGroup.title,
         currency: itemGroup.currency
+      }
+      if (analyse) {
+        const isRelevant = await this._betterBayNLP.isRelevantToListing(
+          cheapestItem,
+          itemGroup.items,
+          itemGroup.title
+        )
+        cheapestItems[id].isRelevant = isRelevant
       }
     }
     return cheapestItems
