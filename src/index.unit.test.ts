@@ -326,8 +326,6 @@ describe('Better Bay Client', () => {
         expect(items['123'].isRelevant).toEqual(true)
       })
     })
-
-    test('Better Bay NLP returns true', () => {})
   })
 
   describe('Health Check', () => {

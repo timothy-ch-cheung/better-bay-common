@@ -41,7 +41,7 @@ export class CachedDictionaryClient<StoredType> {
     return response.data
   }
 
-  _getNounDefinitions (definitionList: Word[]): string[] {
+  _getNounAndAdjDefinitions (definitionList: Word[]): string[] {
     return definitionList
       .map((definition) => {
         return definition.meanings.map((meaning) => {
@@ -72,7 +72,7 @@ export class CachedDictionaryClient<StoredType> {
       return this.__defaultValue
     }
 
-    const definitions = this._getNounDefinitions(response)
+    const definitions = this._getNounAndAdjDefinitions(response)
     const valToStore = this.__mappingFunc(definitions)
     this.__cache.set(word, valToStore)
     return valToStore
