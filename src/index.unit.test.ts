@@ -12,6 +12,7 @@ import { EbayItem, Limit, BetterBayItemGroup } from './types.js'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { AxiosInstance } from 'axios'
 import sinon from 'sinon'
+import { BetterBayNLP } from './nlp/BetterBayNLP.js'
 
 jest.mock('ebay-oauth-nodejs-client', () => {
   return {
@@ -27,6 +28,7 @@ jest.mock('ebay-oauth-nodejs-client', () => {
     })
   }
 })
+jest.mock('./nlp/BetterBayNLP')
 
 const createItem = (colour: string): EbayItem => {
   return {
@@ -232,7 +234,7 @@ describe('Better Bay Client', () => {
       const getItemPromise = client.getCheapestItems(['123'])
       return await getItemPromise.catch((error) => {
         expect(error.message).toEqual(
-          'Call to Ebay API succeeded by zero item groups were returned'
+          'Call to Ebay API succeeded, but zero item groups were returned'
         )
         sinon.assert.calledOnceWithExactly(
           instance.get,
@@ -290,6 +292,38 @@ describe('Better Bay Client', () => {
           instance.get,
           'https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=123'
         )
+      })
+    })
+  })
+
+  describe('Get Cheapest Items, analyse relevance', () => {
+    beforeEach(() => {
+      instance.get.returns(
+        new Promise((resolve) =>
+          resolve({
+            data: { items: [item('3.18'), item('1.18'), item('1.95')] }
+          })
+        )
+      )
+    })
+
+    test('Better Bay NLP returns false', async () => {
+      jest
+        .spyOn(BetterBayNLP.prototype, 'isRelevantToListing')
+        .mockResolvedValueOnce(false)
+      const getItemPromise = client.getCheapestItems(['123'], true)
+      return await getItemPromise.then((items) => {
+        expect(items['123'].isRelevant).toEqual(false)
+      })
+    })
+
+    test('Better Bay NLP returns true', async () => {
+      jest
+        .spyOn(BetterBayNLP.prototype, 'isRelevantToListing')
+        .mockResolvedValueOnce(true)
+      const getItemPromise = client.getCheapestItems(['123'], true)
+      return await getItemPromise.then((items) => {
+        expect(items['123'].isRelevant).toEqual(true)
       })
     })
   })

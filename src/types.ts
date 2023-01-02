@@ -64,6 +64,7 @@ export interface BetterBayItem {
 export interface BetterBayItemResponse extends BetterBayItem {
   title: string
   currency: string
+  isRelevant?: boolean
 }
 
 export interface BetterBayItemGroup {
