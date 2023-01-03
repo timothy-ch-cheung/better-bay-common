@@ -223,4 +223,4 @@ export async function buildBetterBayClient (
   return client
 }
 
-export { BetterBayItemResponse, BetterBayItem }
+export { BetterBayItemResponse }
