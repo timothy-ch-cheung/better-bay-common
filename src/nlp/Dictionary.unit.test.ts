@@ -35,8 +35,8 @@ describe('Dictionary', () => {
   })
 
   test('No definition found', async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      data: noDefinitionResponse
+    mockedAxios.get.mockRejectedValueOnce({
+      response: { data: noDefinitionResponse }
     })
 
     const definition = await Dictionary.getDef('test')

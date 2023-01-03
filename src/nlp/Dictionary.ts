@@ -1,7 +1,6 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 const DICTIONARY_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/'
-const NO_DEFS_FOUND = 'No Definitions Found'
 const NOUN = 'noun'
 const ADJECTIVE = 'adjective'
 
@@ -34,11 +33,17 @@ export class CachedDictionaryClient<StoredType> {
   }
 
   async _callDictionary (word: string): Promise<Word[]> {
-    const response = await axios.get(DICTIONARY_URL + word)
-    if (response.data.title === NO_DEFS_FOUND) {
-      return []
-    }
-    return response.data
+    return await axios
+      .get(DICTIONARY_URL + word)
+      .then((response) => {
+        return response.data
+      })
+      .catch((error: AxiosError) => {
+        if (error.code !== '404') {
+          console.log(error.response)
+        }
+        return []
+      })
   }
 
   _getNounAndAdjDefinitions (definitionList: Word[]): string[] {
