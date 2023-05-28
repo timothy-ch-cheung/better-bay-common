@@ -55,7 +55,7 @@ describe('BetterBayClient', () => {
         expect(cheapestItem.id).toEqual('v1|354294946878|623687040110')
         expect(cheapestItem.price).toEqual('0.99')
         expect(cheapestItem.title).toEqual(
-          'USB Type C Fast Charging Charger Cable for Samsung Galaxy S8 S9 S10 S20+ Note UK'
+          'Genuine USB Type C Fast Charging Charger Cable for Samsung Galaxy S8 S9 S10 S20+'
         )
 
         expect(Object.keys(cheapestItem.description).length).toEqual(2)
