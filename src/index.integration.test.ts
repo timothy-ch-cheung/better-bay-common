@@ -66,7 +66,7 @@ describe('BetterBayClient', () => {
 
     test('Get cheapest item, multiple item groups', async () => {
       const ITEM_GROUP_ID_1 = '294949898083'
-      const ITEM_GROUP_ID_2 = '203640676748'
+      const ITEM_GROUP_ID_2 = '204264026067'
       const response: Promise<Record<string, BetterBayItemResponse>> =
         client.getCheapestItems([ITEM_GROUP_ID_1, ITEM_GROUP_ID_2])
 
@@ -77,7 +77,7 @@ describe('BetterBayClient', () => {
         expect(cheapestItem1.id).toEqual('v1|294949898083|593517639533')
         expect(cheapestItem1.price).toEqual('0.99')
         expect(cheapestItem1.title).toEqual(
-          'Fits Google Pixel 7 /Pixel 6A / Google Pixel 6 Pro Gel Case Clear Cover TPU Soft'
+          'Fits Google Pixel 7 /Pixel 8 / Google Pixel 8 Pro Gel Case Clear Cover TPU Soft'
         )
 
         expect(Object.keys(cheapestItem1.description).length).toEqual(2)
@@ -89,7 +89,7 @@ describe('BetterBayClient', () => {
         const cheapestItem2 = cheapestItems[ITEM_GROUP_ID_2]
 
         expect(cheapestItem2.currency).toEqual('GBP')
-        expect(cheapestItem2.id).toEqual('v1|203640676748|504056286559')
+        expect(cheapestItem2.id).toEqual('v1|204264026067|504828824989')
         expect(cheapestItem2.price).toEqual('1.99')
         expect(cheapestItem2.title).toEqual(
           'Case For Google Pixel 7/6a/6/5a/5/4a/4/3a 5G PU Leather Wallet Flip Phone Cover'
