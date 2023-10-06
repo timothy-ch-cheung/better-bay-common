@@ -2,6 +2,7 @@ import { describe, expect, test, beforeAll } from '@jest/globals'
 import * as dotenv from 'dotenv'
 import { BetterBayClient, buildBetterBayClient } from './index.js'
 import { BetterBayItemResponse, BetterBayLimit } from './types.js'
+import { AxiosError } from 'axios'
 
 dotenv.config()
 
@@ -101,6 +102,15 @@ describe('BetterBayClient', () => {
         )
         expect(cheapestItem2.description.Colour).toEqual('Charging Cable')
       })
+    })
+
+    test('Get non existent item', async () => {
+      const ITEM_GROUP_ID = '1234567890AB'
+      await expect(async () => {
+        await client.getCheapestItems([ITEM_GROUP_ID])
+      }).rejects.toThrowError(
+        new AxiosError('Request failed with status code 404')
+      )
     })
   })
 
