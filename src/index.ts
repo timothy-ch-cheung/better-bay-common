@@ -15,6 +15,7 @@ import {
 import axios, { AxiosInstance } from 'axios'
 import EbayAuthToken from 'ebay-oauth-nodejs-client'
 import { BetterBayNLP } from './nlp/BetterBayNLP.js'
+import * as AxiosLogger from 'axios-logger'
 
 const EBAY_ITEM_BASE_URL = 'https://api.ebay.com/buy/browse/v1/item'
 const EBAY_ANALYTICS_BASE_URL =
@@ -212,6 +213,8 @@ export async function buildBetterBayClient (
       }
     }
   })
+  instance.interceptors.request.use(AxiosLogger.requestLogger)
+  instance.interceptors.response.use(AxiosLogger.responseLogger)
 
   const options = autoRefreshToken
     ? { refreshToken: { delay: token.expiresIn } }
