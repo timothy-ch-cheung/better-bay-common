@@ -214,7 +214,9 @@ export async function buildBetterBayClient (
     }
   })
   instance.interceptors.request.use(AxiosLogger.requestLogger)
-  instance.interceptors.response.use(AxiosLogger.responseLogger)
+  instance.interceptors.response.use((request) => {
+    return AxiosLogger.responseLogger(request, { data: false, headers: false })
+  })
 
   const options = autoRefreshToken
     ? { refreshToken: { delay: token.expiresIn } }
